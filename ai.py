@@ -121,7 +121,7 @@ while True:
     z3 = a2 @ w3 + b3
     probs = softmax(z3.reshape(1, -1))
 
-    predid = np.argmax(probs, axis=1)[0]   # 🔥 THIS LINE FIXES EVERYTHING
+    predid = np.argmax(probs, axis=1)[0]
     predchar = idlabel[predid]
 
     print(f"Prediction: {predchar}")
