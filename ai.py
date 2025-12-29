@@ -4,8 +4,9 @@ from PIL import Image
 
 IMGS = 32
 LR = 0.1
-EPOCHS = 500
+EPOCHS = 100
 DATASET = "dataset"
+BATCH = 128
 
 x = []
 y = []
@@ -42,34 +43,86 @@ def softmax(z):
     e = np.exp(z - np.max(z, axis = 1, keepdims=True))
     return e / np.sum(e, axis=1, keepdims=True)
 
+def relu(z):
+    return np.maximum(0, z)
+
+def relu_derivative(z):
+    return (z > 0).astype(float)
+
 np.random.seed(0)
-w = np.random.randn(IMGS * IMGS, nc) * 0.01
-b = np.zeros((1, nc))
 
+h1 = 256
+h2 = 128
 
+w1 = np.random.randn(x.shape[1], 256) * 0.01
+b1 = np.zeros((1, h1))
+
+w2 = np.random.randn(h1, h2) * 0.01
+b2 = np.zeros((1, h2))
+
+w3 = np.random.randn(h2, nc) * 0.01
+b3 = np.zeros((1, nc))
+n = len(x)
 for epoch in range(EPOCHS):
-    z = np.dot(x, w) + b
-    y_hat = softmax(z)
+    perm = np.random.permutation(n)
+    x_shuf = x[perm]
+    y_shuf = y_onehot[perm]
 
-    dz = y_hat - y_onehot
-    dw = np.dot(x.T, dz) / len(x)
-    db = np.mean(dz, axis=0, keepdims=True)
+    epoch_loss = 0
+    for i in range(0, n, BATCH):
+        xb = x_shuf[i:i+BATCH]
+        yb = y_shuf[i:i+BATCH]
 
-    w -= LR * dw
-    b -= LR * db
-    print(w)
+
+        z1 = np.dot(xb, w1) + b1
+        a1 = relu(z1)
+
+        z2 = np.dot(a1, w2) + b2
+        a2 = relu(z2)
+
+        z3 = np.dot(a2, w3) + b3
+        y_hat = softmax(z3)
+
+        dz3 = y_hat - yb
+        dw3 = np.dot(a2.T, dz3) / len(xb)
+        db3 = np.mean(dz3, axis=0, keepdims=True)
+    
+        da2 = np.dot(dz3, w3.T)
+        dz2 = da2 * relu_derivative(z2)
+        dw2 = np.dot(a1.T , dz2) / len(xb)
+        db2 = np.mean(dz2, axis=0, keepdims=True)
+
+        da1 = np.dot(dz2, w2.T)
+        dz1 = da1 * relu_derivative(z1)
+        dw1 = np.dot(xb.T, dz1) / len(xb)
+        db1 = np.mean(dz1, axis=0, keepdims=True)
+
+        w3 -= LR * dw3
+        b3 -= LR * db3
+        w2 -= LR * dw2
+        b2 -= LR * db2
+        w1 -= LR * dw1
+        b1 -= LR * db1
+    print(w1)
+
 while True:
-    j = input("Enter a name: ")
+    j = input("Enter image path: ")
+
     img = Image.open(j).convert("L")
     img = img.resize((IMGS, IMGS))
-    x = np.array(img).flatten() / 255
+    x_test = np.array(img).flatten() / 255.0
 
-    scores = np.dot(x, w) + b
+    z1 = x_test @ w1 + b1
+    a1 = relu(z1)
 
-    probs = softmax(scores.reshape(1, -1))
+    z2 = a1 @ w2 + b2
+    a2 = relu(z2)
 
-    predid = np.argmax(probs)
+    z3 = a2 @ w3 + b3
+    probs = softmax(z3.reshape(1, -1))
+
+    predid = np.argmax(probs, axis=1)[0]   # 🔥 THIS LINE FIXES EVERYTHING
     predchar = idlabel[predid]
 
-    print(probs[0][predid] * 100 , "%")
-    print(predchar)
+    print(f"Prediction: {predchar}")
+    print(f"Confidence: {probs[0, predid] * 100:.2f}%")
