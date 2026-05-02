@@ -1,4 +1,3 @@
-*This project was created by Castle_sp5 AKA: Ismail Boujdad*
 
 # Description
 
@@ -23,3 +22,6 @@ PS: Make Sure to write the letter in black with white background so the AI can d
 
 
 https://www.youtube.com/watch?v=ZyhrYis509A
+
+
+*This project was created by Castle_sp5 (Ismail Boujdad)*
