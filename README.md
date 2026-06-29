@@ -1,27 +1,27 @@
-
-# Description
-
-this is a 42 school competition about creating an AI that detects Arabic letters, it's simple and cool if you want to try it
+# Arabic Letters Detector
 
 
-# Usage
+## Description
+
+this is a 42 school competition about creating an AI that detects Arabic letters, the goal is to create a neural network from scratch , and learn AI fundamentals.
+
+IMPORTANT NOT:
+      i do not consider this as one of my professional projects , so please do not try to copy my code for professional use.
+
+
+## Usage
 
 ```bash
 $>python3 ai.py
 ```
 
-wait 5-10 minutes so the program can learn how does the arabic letters look like and then enter the path for your image
+it's a neural network based project , which means you need to wait for the AI to adjust it's weights (learn how arabic letters look like)
 
 the more EPOCHS you gave it the better the output result is
 
-PS: Make Sure to write the letter in black with white background so the AI can detect it
 
 # Credit 
 
 `42 school , 1337 rabat campus`
 
-
-https://www.youtube.com/watch?v=ZyhrYis509A
-
-
-*This project was created by Castle_sp5 (Ismail Boujdad)*
+*This project was created by (Ismail Boujdad)*
